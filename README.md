@@ -1,8 +1,7 @@
-
 <H3>ENTER YOUR NAME : LATHIKESHWARAN J</H3>
 <H3>ENTER YOUR REGISTER NO : 212222230072</H3>
 <H3>EX. NO.4</H3>
-<H3>DATE:</H3>
+<H3>DATE: 27-09-2024</H3>
 <H1 ALIGN =CENTER>Implementation of MLP with Backpropagation for Multiclassification</H1>
 <H3>Aim:</H3>
 To implement a Multilayer Perceptron for Multi classification
@@ -116,81 +115,63 @@ Normalize our dataset.
 
 <H3>Program:</H3> 
 
-```python
-import numpy as np
+```
 import pandas as pd
-import io
-import matplotlib.pyplot as plt
+import sklearn
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report, confusion_matrix
 
-x=np.array([[0, 0, 1, 1],[0, 1, 0, 1]])
-y=np.array([[0, 1, 1, 0]])
+url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
+names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'Class']
+irisdata = pd.read_csv(url, names=names)
 
-n_x = 2
-n_y = 1
-n_h = 2
+X = irisdata.iloc[:, 0:4]
+y = irisdata.select_dtypes(include=[object])
 
-m = x.shape[1]
+X.head()
+y.head()
 
-lr = 0.1
+y.Class.unique()
 
-np.random.seed(2)
+le = preprocessing.LabelEncoder()
+y = y.apply(le.fit_transform)
+y.head()
 
-w1 = np.random.rand(n_h,n_x) #weight matrix for hidden layer
-w2 = np.random.rand(n_y,n_h) #weight matrix for output layer
+X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.20)
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train = scaler.transform(X_train)
+X_test = scaler.transform(X_test)
 
-losses = []
-def sigmoid(z):
-  z = 1/(1+np.exp(-z))
-  return z
-  
-def forward_prop(w1,w2,x):
-  z1 = np.dot(w1,x)
-  a1 = sigmoid(z1)
-  z2 = np.dot(w2,a1)
-  a2 = sigmoid(z2)
-  return z1,a1,z2,a2
-  
-def back_prop(m,w1,w2,z1,a1,z2,a2,y):
-  dz2 = a2-y
-  dw2 = np.dot(dz2,a1.T)/m
-  dz1 = np.dot(w2.T,dz2) * a1*(1-a1)
-  dw1 = np.dot(dz1,x.T)/m
-  dw1 = np.reshape(dw1,w1.shape)
-  dw2 = np.reshape(dw2,w2.shape)
-  return dz2,dw2,dz1,dw1
+mlp = MLPClassifier(hidden_layer_sizes=(10, 10, 10), max_iter=1000)
+mlp.fit(X_train, y_train)
 
-iterations = 10000
-for i in range(iterations):
-  z1,a1,z2,a2 = forward_prop(w1,w2,x)
-  loss = -(1/m) * np.sum(y*np.log(a2) + (1-y)*np.log(1-a2))
-  losses.append(loss)
-  da2,dw2,dz1,dw1 = back_prop(m, w1,w2,z1,a1,z2,a2,y)
-  w2 = w2-lr*dw2
-  w1 = w1-lr*dw1
-  
-#we plot losses to see how our network is doing
-plt.plot(losses)
-plt.xlabel("EPOCHS")
-plt.ylabel("Loss value")
+predictions = mlp.predict(X_test)
+flower_predictions = le.inverse_transform(predictions)
 
-def predict(w1,w2,input):
-    z1,a1,z2,a2 = forward_prop(w1,w2,test)
-    a2 = np.squeeze(a2)
-    if a2>=0.5:
-        print( [i[0] for i in input], 1)
-    else:
-        print( [i[0] for i in input], 0)
-
-print('Input',' Output')
-test=np.array([[1],[0]])
-predict(w1,w2,test)
-test=np.array([[1],[1]])
-predict(w1,w2,test)
+print(flower_predictions)  
+print(confusion_matrix(y_test, predictions))
+print(classification_report(y_test, predictions))
 ```
 
 <H3>Output:</H3>
 
-![image](https://github.com/user-attachments/assets/39813a39-e7a8-4747-8c19-b672a5e44f6e)
+![image](https://github.com/user-attachments/assets/00734834-75b6-4308-adb5-c495f0094b4a)
+
+![image](https://github.com/user-attachments/assets/4b1ceb23-3d32-40a3-8480-62ba5ff05c13)
+
+![image](https://github.com/user-attachments/assets/7f647ed3-cf0e-4c45-8aa9-5d83a58249a5)
+
+![image](https://github.com/user-attachments/assets/aa8a9f00-da35-4b6d-bbf0-af3bc134721f)
+
+![image](https://github.com/user-attachments/assets/827b724c-0ff5-4519-9077-398c0a9c67e9)
+
+
+
+
 
 
 <H3>Result:</H3>
